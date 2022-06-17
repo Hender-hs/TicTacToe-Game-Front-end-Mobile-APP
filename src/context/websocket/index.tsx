@@ -9,6 +9,7 @@ interface WebSocketContextType {
 	"isWsUp": boolean
 	"wsMessage": any
 	"wsError": any
+	"cnnSessionId": number | null
 }
 
 interface WebSocketProviderType {
@@ -24,8 +25,9 @@ export const WebSocketProvider = ({children}: WebSocketProviderType) => {
 	const [isWsUp, setIsWsUp] 							= useState<boolean>(false)
 	const [wsMessage, setWsMessage] 					= useState<any>(null)
 	const [wsError, setWsError] 						= useState<any>(null)
+	const [cnnSessionId, setCnnSessionId]   = useState(null)
 
-	const wsManager = new WS(setIsWsUp, setWsMessage, setWsError)
+	const wsManager = new WS(setIsWsUp, setWsMessage, setWsError, cnnSessionId, setCnnSessionId)
 
 	const wsConnection = useWebSocket(`ws://${'0.0.0.0:8080'}`, wsManager.getWSOptionsMethods(wsManager))
 
@@ -35,7 +37,7 @@ export const WebSocketProvider = ({children}: WebSocketProviderType) => {
 
 	return(
 		<WebSocketContext.Provider
-			value={{wsConnectionMethods, isWsUp, wsMessage, wsError}}
+			value={{wsConnectionMethods, isWsUp, wsMessage, wsError, cnnSessionId}}
 		>
 			{children}
 		</WebSocketContext.Provider>
