@@ -15,11 +15,15 @@ export class WS {
 	"setIsWsUpState": any
 	"setWsMessageState": any
 	"setWsErrorState": any
+	"cnnSessionIdState": number | null
+	"setCnnSessionIdState": Function
 
-	constructor(setIsWsUpState: Function, setWsMessageState: Function, setWsErrorState: Function) {
+	constructor(setIsWsUpState: Function, setWsMessageState: Function, setWsErrorState: Function, cnnSessionIdState: number | null, setCnnSessionIdState: Function) {
 		this.setIsWsUpState 	= setIsWsUpState
 		this.setWsMessageState 	= setWsMessageState
 		this.setWsErrorState 	= setWsErrorState
+		this.cnnSessionIdState = cnnSessionIdState
+		this.setCnnSessionIdState = setCnnSessionIdState
 	}
 	
 	private onOpen() {
@@ -33,6 +37,18 @@ export class WS {
 	}
 
 	private onMessage(message: WebSocketMessageEvent) {
+
+		if (!this.cnnSessionIdState === null) {
+			const cnnSessId = JSON.parse(message.data).cnn_session_id
+			if (!cnnSessId) {
+				const errorMsg = 'session id not set and not received'
+				console.error(errorMsg)
+				this.onClose({} as WebSocketMessageEvent)
+				return
+			}
+
+			this.setCnnSessionIdState(cnnSessId)
+		}
 		this.setWsMessageState(message.data)
 		console.log('ws message: ', message)
 	}
